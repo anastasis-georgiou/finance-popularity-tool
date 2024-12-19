@@ -14,6 +14,34 @@ services:
         networks:
             - laravel_network
 
+    queue-worker:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel-queue-worker
+        working_dir: /var/www/html
+        command: sh -c "php artisan queue:work redis --verbose"
+        depends_on:
+            - app
+            - redis
+        networks:
+            - laravel_network
+
+    # Scheduler service
+    scheduler:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel-scheduler
+        working_dir: /var/www/html
+        command: sh -c "php artisan schedule:work"
+        depends_on:
+            - app
+            - redis
+        networks:
+            - laravel_network
+
+
     db:
         image: mysql:8.0
         container_name: mysql-db

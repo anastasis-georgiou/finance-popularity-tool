@@ -20,31 +20,20 @@ class UpdateStatsJob implements ShouldQueue
      */
     public function handle()
     {
-        // Calculate periods
-        $now = now();
-        $startOfDay = $now->copy()->startOfDay();
-        $startOfWeek = $now->copy()->startOfWeek();
-        $startOfMonth = $now->copy()->startOfMonth();
-
-        // Query all instruments
-        $instruments = Instrument::all(['id']);
-
-        foreach ($instruments as $instrument) {
-            $instrumentId = $instrument->id;
-
+        foreach (Instrument::all(['id']) as $instrument) {
             // Count mentions for each period
-            $dailyCount = $this->countMentions($instrumentId, $startOfDay);
-            $weeklyCount = $this->countMentions($instrumentId, $startOfWeek);
-            $monthlyCount = $this->countMentions($instrumentId, $startOfMonth);
+            $dailyCount = $this->countMentions($instrument->id, now()->startOfDay());
+            $weeklyCount = $this->countMentions($instrument->id, now()->startOfWeek());
+            $monthlyCount = $this->countMentions($instrument->id, now()->startOfMonth());
 
             // Update or insert into stats table
             Stat::updateOrCreate(
-                ['instrument_id' => $instrumentId],
+                ['instrument_id' => $instrument->id],
                 [
                     'mentions_daily' => $dailyCount,
                     'mentions_weekly' => $weeklyCount,
                     'mentions_monthly' => $monthlyCount,
-                    'last_updated' => $now
+                    'last_updated' => now()
                 ]
             );
         }
