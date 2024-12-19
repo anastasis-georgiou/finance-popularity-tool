@@ -1,5 +1,6 @@
 services:
     app:
+        restart: always
         build:
             context: .
             dockerfile: Dockerfile
@@ -15,6 +16,7 @@ services:
             - laravel_network
 
     queue-worker:
+        restart: always
         build:
             context: .
             dockerfile: Dockerfile
@@ -27,8 +29,8 @@ services:
         networks:
             - laravel_network
 
-    # Scheduler service
     scheduler:
+        restart: always
         build:
             context: .
             dockerfile: Dockerfile
@@ -59,6 +61,7 @@ services:
             - laravel_network
 
     redis:
+        restart: always
         image: redis:7
         container_name: redis-cache
         ports:
@@ -66,21 +69,9 @@ services:
         networks:
             - laravel_network
 
-    redisinsight:
-        image: redislabs/redisinsight:latest
-        container_name: redisinsight
-        ports:
-            - "5540:5540"
-        networks:
-            - laravel_network
-        # Volume for persisting RedisInsight configuration, optional
-        volumes:
-            - redisinsight-data:/db
-
 networks:
     laravel_network:
         driver: bridge
 
 volumes:
     db-data:
-    redisinsight-data:
