@@ -1,13 +1,13 @@
 <?php
 
-use App\Jobs\CrawlTweetsJob;
-use App\Models\Handle;
+use App\Http\Controllers\TweetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\HandleController;
+use App\Http\Controllers\InstrumentController;
 
+Route::apiResource('instruments', InstrumentController::class);
+Route::apiResource('handles', HandleController::class);
+Route::apiResource('tweets', TweetController::class);
 Route::get('/top-instruments/{period}', [StatsController::class, 'topInstruments']);
-
-Route::get('/test-redis/{id}', function ($id) {
-    CrawlTweetsJob::dispatch(Handle::where('id', $id)->firstOrFail());
-    return 'Job dispatched!';
-})->where(['id' => '[0-9]+']);
+Route::get('/top-instrument/{period}', [StatsController::class, 'topInstruments']);

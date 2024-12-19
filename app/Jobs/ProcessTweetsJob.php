@@ -5,11 +5,16 @@ namespace App\Jobs;
 use App\Models\Instrument;
 use App\Models\InstrumentMention;
 use App\Models\Tweet;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class ProcessTweetsJob implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     public $tweet;
 
     public function __construct(Tweet $tweet)

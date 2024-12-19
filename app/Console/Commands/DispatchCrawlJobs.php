@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\CrawlTweetsJob;
 use App\Models\Handle;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class DispatchCrawlJobs extends Command
@@ -31,7 +32,7 @@ class DispatchCrawlJobs extends Command
             return true;
         }
 
-        $nextCrawlTime = $handle->last_crawled_at->addSeconds($handle->crawling_freq);
+        $nextCrawlTime = Carbon::parse($handle->last_crawled_at)->addSeconds($handle->crawling_freq);
         return now()->greaterThanOrEqualTo($nextCrawlTime);
     }
 }

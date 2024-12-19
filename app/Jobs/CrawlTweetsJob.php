@@ -4,13 +4,14 @@ namespace App\Jobs;
 
 use App\Models\Handle;
 use App\Models\Tweet;
-use Illuminate\Queue\Jobs\Job;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue; // Import this
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Symfony\Component\DomCrawler\Crawler;
 
 class CrawlTweetsJob implements ShouldQueue
 {
@@ -30,7 +31,10 @@ class CrawlTweetsJob implements ShouldQueue
             Log::info("Crawling tweets for handle: {$this->handle->handle}");
 
             // Simulate fetching tweets
-            $tweets = $this->fetchTweets();
+            $tweets = $this->fetchMokTweets();
+
+            // Fetch tweets from twitter
+            //$tweets = $this->fetchTweets($this->handle->handle);
 
             foreach ($tweets as $tweet) {
                 // Save tweets in the database
@@ -53,7 +57,7 @@ class CrawlTweetsJob implements ShouldQueue
         }
     }
 
-    private function fetchTweets(): array
+    public function fetchMokTweets(): array
     {
         // Simulating fetching tweets; replace with scraping logic if necessary
         return [
@@ -68,6 +72,47 @@ class CrawlTweetsJob implements ShouldQueue
                 'created_at' => now(),
             ],
         ];
+    }
+
+    public function fetchTweets(string $twitterHandle): array
+    {
+        $client = new Client([
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            ],
+            'timeout' => 10,
+            'verify' => false
+        ]);
+
+        // Request the Twitter page for the given handle
+        $url = env("CRAWL_TARGET_SITE", "https://x.com")."/{$twitterHandle}";
+        $response = $client->get($url);
+
+        $html = (string) $response->getBody();
+
+        Log::info("response data: {$html}");
+
+        // Parse HTML to extract tweets
+        $crawler = new Crawler($html);
+
+        // This CSS selector may break if Twitter changes its layout.
+        // It might not work due to JS rendering of tweets.
+        $tweets = $crawler->filter('article div[data-testid="tweet"]')->each(function (Crawler $node) {
+            // Attempt to find tweet text
+            // This is a heuristic and may need adjusting if Twitter changes structure
+            $contentNode = $node->filter('div[lang]');
+            $content = $contentNode->count() ? $contentNode->text() : '';
+
+            // Without full JS-rendered HTML, some tweets may not appear correctly.
+            // Also, determining "created_at" is non-trivial without API or JSON data.
+            return [
+                'id' => uniqid(),
+                'content' => $content,
+                'created_at' => now(), // Placeholder since we don't get an actual timestamp easily
+            ];
+        });
+
+        return $tweets;
     }
 
     public function getJobId()
