@@ -5,10 +5,10 @@ namespace App\Jobs;
 use App\Models\Instrument;
 use App\Models\InstrumentMention;
 use App\Models\Tweet;
-use Illuminate\Queue\Jobs\Job;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
-class ProcessTweetsJob extends Job
+class ProcessTweetsJob implements ShouldQueue
 {
     public $tweet;
 

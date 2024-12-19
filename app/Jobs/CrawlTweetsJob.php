@@ -6,9 +6,17 @@ use App\Models\Handle;
 use App\Models\Tweet;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue; // Import this
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
-class CrawlTweetsJob extends Job
+class CrawlTweetsJob implements ShouldQueue
 {
+
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     public $handle;
 
     public function __construct(Handle $handle)

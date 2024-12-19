@@ -6,6 +6,9 @@ RUN apt-get update && apt-get install -y \
     zip unzip git curl libpng-dev libonig-dev libxml2-dev \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
+# Install redis driver
+RUN pecl install redis && docker-php-ext-enable redis
+
 # Enable Apache Rewrite Module
 RUN a2enmod rewrite
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Instrument extends Model
 {
@@ -13,4 +14,10 @@ class Instrument extends Model
     {
         return $this->belongsToMany(Tweet::class, 'instrument_mentions');
     }
+
+    public function mentions(): HasMany
+    {
+        return $this->hasMany(InstrumentMention::class, 'instrument_id');
+    }
+
 }
