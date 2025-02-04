@@ -124,7 +124,7 @@ Returns top 10 instruments for the given period, cached for performance.
 
 - **Queue:** Uses Redis. php artisan queue:work redis to process queued jobs.
 
-- **Scheduler:** php artisan schedule:work runs tasks defined in app/Console/Kernel.php (e.g., stats:update).
+- **Scheduler:** php artisan schedule:work runs tasks.
 
 - In Docker, queue-worker and scheduler services run these continuously.
 
